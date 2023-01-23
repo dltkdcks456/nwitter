@@ -1,18 +1,18 @@
 import React, { useState, useEffect } from "react";
 import {
   collection,
-  addDoc,
   getFirestore,
-  getDocs,
   query,
   orderBy,
   onSnapshot,
 } from "firebase/firestore";
+
 import { app } from "fbase";
+import Nweet from "components/Nweet";
+import NweetFactory from "components/NweetFactory";
 
 const Home = ({ userObj }) => {
   // console.log(userObj);
-  const [nweet, setNweet] = useState("");
   const [nweets, setNweets] = useState([]);
   // const getNweets = async () => {
   //   const db = getFirestore(app);
@@ -38,41 +38,17 @@ const Home = ({ userObj }) => {
     });
   }, []);
 
-  const onSubmit = async (e) => {
-    e.preventDefault();
-    const db = getFirestore(app);
-    const docRef = await addDoc(collection(db, "nweets"), {
-      text: nweet,
-      createdAt: Date.now(),
-      creatorId: userObj.uid,
-    });
-    console.log("Document written with ID: ", docRef.id);
-    setNweet("");
-  };
-  const onChange = (e) => {
-    const {
-      target: { value },
-    } = e;
-    setNweet(value);
-  };
   return (
     <div>
-      <form onSubmit={onSubmit}>
-        <input
-          value={nweet}
-          onChange={onChange}
-          type="text"
-          placeholder="What's on your mind?"
-          maxLength={120}
-        />
-        <input type="submit" value="Nweet" />
-      </form>
+      <NweetFactory userObj={userObj} />
       <div>
         {nweets.map((nweet) => {
           return (
-            <div key={nweet.id}>
-              <h4>{nweet.text}</h4>
-            </div>
+            <Nweet
+              key={nweet.id}
+              nweetObj={nweet}
+              isOwner={nweet.creatorId === userObj.uid}
+            />
           );
         })}
       </div>
